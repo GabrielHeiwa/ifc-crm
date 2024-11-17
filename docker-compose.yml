@@ -1,0 +1,21 @@
+
+volumes:
+  db-data:
+    name: ${PROJECT}-${ENVIRONMENT}-db
+
+networks:
+  net:
+    name: ${PROJECT}-${ENVIRONMENT}-net
+
+services:
+  db:
+    image: bitnami/postgresql:13.17.0-debian-12-r0
+    container_name: ${PROJECT}-${ENVIRONMENT}-db
+    ports:
+      - ${PORT_POSTGRES}:5432
+    networks:
+      - net
+    volumes:
+      - db-data:/bitnami/postgresql
+    environment:
+      - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
