@@ -12,6 +12,10 @@ interface NegotiationsState {
 
 	deleteNegotiationDialogVisible: boolean;
 	setDeleteNegotiationDialogVisible: (status: boolean) => void;
+
+	productsAdded: any[];
+	addProduct: (product: any) => void;
+	removeProduct: (id: string) => void;
 }
 
 export const useNegotiationStore = create<NegotiationsState>()((set) => ({
@@ -33,5 +37,32 @@ export const useNegotiationStore = create<NegotiationsState>()((set) => ({
 	deleteNegotiationDialogVisible: false,
 	setDeleteNegotiationDialogVisible(status) {
 		return set({ deleteNegotiationDialogVisible: status });
+	},
+
+	productsAdded: [
+		{
+			id: "1",
+			name: "mesa gamer",
+			price: 150,
+		},
+		{
+			id: "2",
+			name: 'Monitor 27"',
+			price: 800,
+		},
+	],
+
+	addProduct(product: any) {
+		return set((state) => ({
+			productsAdded: [...state.productsAdded, product],
+		}));
+	},
+
+	removeProduct(id: string) {
+		return set((state) => ({
+			productsAdded: state.productsAdded.filter(
+				(product) => product.id !== id
+			),
+		}));
 	},
 }));

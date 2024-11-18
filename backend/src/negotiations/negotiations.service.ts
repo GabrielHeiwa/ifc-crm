@@ -4,22 +4,22 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class NegotiationsService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async create(data: Prisma.NegotiationCreateInput) {
-    return await this.prismaService.negotiation.create({
+  async create(data: any) {
+    await this.prismaService.negotiation.create({
       data: {
-        ...data,
+        discount: data.discount,
+        description: data.description,
+        totalValue: data.totalValue,
+        clientId: data.clientId,
+        supplierId: data.supplierId,
         NegotiationProduct: {
           createMany: {
-            data: [
-              {
-                productId: "82c7720f-9959-49af-a124-b88fd37a7784"
-              }
-            ]
-          }
-        }
-      }
+            data: data.products.map((p: any) => ({ productId: p.id })),
+          },
+        },
+      },
     });
   }
 
@@ -28,20 +28,20 @@ export class NegotiationsService {
       include: {
         client: {
           include: {
-            user: true
-          }
+            user: true,
+          },
         },
         supplier: {
           include: {
-            user: true
-          }
+            user: true,
+          },
         },
         NegotiationProduct: {
           include: {
-            product: true
-          }
-        }
-      }
+            product: true,
+          },
+        },
+      },
     });
 
     return negotiations;
