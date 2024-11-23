@@ -1,10 +1,4 @@
 import { api } from "@/api";
-import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
 	Table,
@@ -16,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
 import {
-	ChevronDown,
 	Eye,
 	Loader2Icon,
 	PencilIcon,
@@ -27,6 +20,8 @@ import { useNegotiationStore } from "./negotiations.store";
 import { CreateNegotiationDialog } from "./dialogs/create";
 import { Toggle } from "@/components/ui/toggle";
 import { ViewNegotiationDialog } from "./dialogs/view";
+import { EditNegotiationDialog } from "./dialogs/edit";
+import { DeleteNegotiationDialog } from "./dialogs/delete";
 
 export function Negotiations() {
 	// Hooks
@@ -34,13 +29,12 @@ export function Negotiations() {
 		createNegotiationDialogVisible,
 		deleteNegotiationDialogVisible,
 		editNegotiationDialogVisible,
-		negotiationSelected,
 		viewNegotiationDialogVisible,
 		setCreateNegotiationDialogVisible,
 		setDeleteNegotiationDialogVisible,
 		setEditNegotiationDialogVisible,
 		setNegotiationSelected,
-		setViewNegotiationDialogVisible
+		setViewNegotiationDialogVisible,
 	} = useNegotiationStore();
 
 	// Queries
@@ -62,6 +56,8 @@ export function Negotiations() {
 		<div className='flex flex-col gap-y-2'>
 			{createNegotiationDialogVisible && <CreateNegotiationDialog />}
 			{viewNegotiationDialogVisible && <ViewNegotiationDialog />}
+			{editNegotiationDialogVisible && <EditNegotiationDialog />}
+			{deleteNegotiationDialogVisible && <DeleteNegotiationDialog />}
 
 			<div className='flex flex-row justify-end items-center'>
 				<Button
@@ -83,12 +79,13 @@ export function Negotiations() {
 						<TableHead className='text-white'>Disconto</TableHead>
 						<TableHead className='text-white'>Fornecedor</TableHead>
 						<TableHead className='text-white'>Cliente</TableHead>
+						<TableHead className='text-white'>Status</TableHead>
 						<TableHead className='text-white'></TableHead>
 					</TableRow>
 				</TableHeader>
 
 				<TableBody>
-					{data?.data.map((negotiation: any) => {
+					{data?.data.sort((a: any, b: any) => a.id.localeCompare(b.id)).map((negotiation: any) => {
 						return (
 							<TableRow>
 								<TableCell>{negotiation.id}</TableCell>
@@ -109,12 +106,17 @@ export function Negotiations() {
 								<TableCell>
 									{negotiation.client.user.email}
 								</TableCell>
+								<TableCell>
+									{negotiation.status}
+								</TableCell>
 								<TableCell className='flex flex-row justify-end gap-x-1'>
 									<Toggle
 										className='hover:text-gray-200 hover:bg-gray-600'
 										onClick={() => {
 											setNegotiationSelected(negotiation);
-											setViewNegotiationDialogVisible(true);
+											setViewNegotiationDialogVisible(
+												true
+											);
 										}}
 									>
 										<Eye className='w-6 h-6' />
@@ -122,8 +124,10 @@ export function Negotiations() {
 									<Toggle
 										className='hover:text-blue-200 hover:bg-blue-600'
 										onClick={() => {
-											// setProductSelected(product);
-											// setEditProductDialogVisible(true);
+											setNegotiationSelected(negotiation);
+											setEditNegotiationDialogVisible(
+												true
+											);
 										}}
 									>
 										<PencilIcon className='w-6 h-6' />
@@ -131,8 +135,10 @@ export function Negotiations() {
 									<Toggle
 										className='hover:text-red-200 hover:bg-red-600'
 										onClick={() => {
-											// setProductSelected(product);
-											// setDeleteProductDialogVisible(true);
+											setNegotiationSelected(negotiation);
+											setDeleteNegotiationDialogVisible(
+												true
+											);
 										}}
 									>
 										<Trash2Icon className='w-6 h-6' />

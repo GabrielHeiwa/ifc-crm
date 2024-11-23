@@ -19,7 +19,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import {
 	Table,
@@ -60,24 +60,40 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
 import { queryClient } from "@/routes";
+import { toast } from "sonner";
 
-export function CreateNegotiationDialog() {
+export function EditNegotiationDialog() {
 	// States
 	const [open, setOpen] = useState(false);
 	const [value, setValue] = useState("");
 	const [product, setProduct] = useState<any>(undefined);
 
 	// Hooks
-	const form = useForm();
 	const {
-		setCreateNegotiationDialogVisible,
-		createNegotiationDialogVisible,
+		setEditNegotiationDialogVisible,
+		editNegotiationDialogVisible,
 		removeProduct,
 		productsAdded,
 		addProduct,
+		negotiationSelected,
+		setProducts,
 	} = useNegotiationStore();
+	const form = useForm({
+		defaultValues: {
+			description: negotiationSelected?.description,
+			totalValue: new Intl.NumberFormat("pt-br", {
+				style: "currency",
+				currency: "BRL",
+			}).format(negotiationSelected?.totalValue),
+			discount: new Intl.NumberFormat("pt-br", {
+				style: "percent",
+			}).format(negotiationSelected?.discount),
+			supplier: negotiationSelected?.supplierId,
+			client: negotiationSelected?.clientId,
+			status: negotiationSelected?.status,
+		},
+	});
 
 	// Queries
 	const getProducts = useQuery({
@@ -126,9 +142,10 @@ export function CreateNegotiationDialog() {
 	);
 
 	// Mutations
-	const createNegotiation = useMutation({
-		mutationFn: (body: any) => api.post("/negotiations", body),
-		mutationKey: ["create-negotiation"],
+	const editNegotiation = useMutation({
+		mutationFn: (body: any) =>
+			api.put("/negotiations/" + negotiationSelected?.id!, body),
+		mutationKey: ["edit-negotiation"],
 	});
 
 	// Refs
@@ -142,27 +159,48 @@ export function CreateNegotiationDialog() {
 		data.supplierId = data.supplier;
 		data.products = productsAdded;
 
-		await createNegotiation.mutateAsync(data);
+		await editNegotiation.mutateAsync(data);
 
 		await queryClient.invalidateQueries({
 			queryKey: ["get-negotiations"],
 		});
 
-		toast.success("Negociação criada com sucesso.");
+		toast.success("Negociação atualizada com sucesso");
 
-		setCreateNegotiationDialogVisible(false);
+		setEditNegotiationDialogVisible(false);
 	}
+
+	// UseEffects
+	useEffect(() => {
+		negotiationSelected?.NegotiationProduct?.forEach(
+			({ product: { id, name, price } }: any) => {
+				addProduct({ id, name, price });
+
+				return;
+			}
+		);
+
+		return () => {
+			form.resetField("client");
+			form.resetField("description");
+			form.resetField("discount");
+			form.resetField("supplier");
+			form.resetField("totalValue");
+			form.resetField("status");
+			setProducts([]);
+		};
+	}, []);
 
 	return (
 		<Dialog
-			open={createNegotiationDialogVisible}
-			onOpenChange={setCreateNegotiationDialogVisible}
+			open={editNegotiationDialogVisible}
+			onOpenChange={setEditNegotiationDialogVisible}
 		>
 			<DialogContent className='max-w-screen-lg'>
 				<DialogHeader>
-					<DialogTitle>Nova Negociação</DialogTitle>
+					<DialogTitle>Editar Negociação</DialogTitle>
 					<DialogDescription>
-						Está ação criará uma nova Negociação
+						Está ação editará uma Negociação
 					</DialogDescription>
 				</DialogHeader>
 
@@ -296,9 +334,9 @@ export function CreateNegotiationDialog() {
 														({
 															value,
 															label,
-															client,
 														}: any) => (
 															<SelectItem
+																key={value}
 																value={value}
 															>
 																{label}
@@ -336,9 +374,9 @@ export function CreateNegotiationDialog() {
 														({
 															value,
 															label,
-															supplier,
 														}: any) => (
 															<SelectItem
+																key={value}
 																value={value}
 															>
 																{label}
@@ -366,7 +404,6 @@ export function CreateNegotiationDialog() {
 										<FormLabel>Status</FormLabel>
 										<FormControl>
 											<Select
-												defaultValue='Não iniciado'
 												value={field.value}
 												onValueChange={field.onChange}
 											>
@@ -501,7 +538,7 @@ export function CreateNegotiationDialog() {
 					<TableBody>
 						{productsAdded.map((product: any) => {
 							return (
-								<TableRow>
+								<TableRow key={product.id}>
 									<TableCell>{product.id}</TableCell>
 
 									<TableCell>{product.name}</TableCell>
@@ -532,12 +569,12 @@ export function CreateNegotiationDialog() {
 				<DialogFooter>
 					<Button
 						variant={"ghost"}
-						onClick={() => setCreateNegotiationDialogVisible(false)}
+						onClick={() => setEditNegotiationDialogVisible(false)}
 					>
 						Cancelar
 					</Button>
 					<Button onClick={() => formRef.current?.requestSubmit()}>
-						Criar
+						Salvar
 					</Button>
 				</DialogFooter>
 			</DialogContent>

@@ -73,6 +73,7 @@ model Negotiation {
   discount    Float
   totalValue  Float  @map("total_value")
   description String
+  status      String @default("Não iniciado")
 
   clientId String @map("client_id")
   client   Client @relation(fields: [clientId], references: [id])

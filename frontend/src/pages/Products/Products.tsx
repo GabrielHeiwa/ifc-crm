@@ -73,44 +73,50 @@ export function Products() {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{data?.data.map((product: any) => {
-						return (
-							<TableRow>
-								<TableCell>{product.id}</TableCell>
+					{data?.data
+						.sort((a: any, b: any) => a.id.localeCompare(b.id))
+						.map((product: any) => {
+							return (
+								<TableRow>
+									<TableCell>{product.id}</TableCell>
 
-								<TableCell>{product.name}</TableCell>
+									<TableCell>{product.name}</TableCell>
 
-								<TableCell>
-									{new Intl.NumberFormat("pt-BR", {
-										style: "currency",
-										currency: "BRL",
-									}).format(product.price)}
-								</TableCell>
+									<TableCell>
+										{new Intl.NumberFormat("pt-BR", {
+											style: "currency",
+											currency: "BRL",
+										}).format(product.price)}
+									</TableCell>
 
-								<TableCell className='flex flex-row justify-end gap-x-1'>
-									<Toggle
-										className='hover:text-blue-200 hover:bg-blue-600'
-										onClick={() => {
-											setProductSelected(product);
-											setEditProductDialogVisible(true);
-										}}
-									>
-										<PencilIcon className='w-6 h-6' />
-									</Toggle>
+									<TableCell className='flex flex-row justify-end gap-x-1'>
+										<Toggle
+											className='hover:text-blue-200 hover:bg-blue-600'
+											onClick={() => {
+												setProductSelected(product);
+												setEditProductDialogVisible(
+													true
+												);
+											}}
+										>
+											<PencilIcon className='w-6 h-6' />
+										</Toggle>
 
-									<Toggle
-										className='hover:text-red-200 hover:bg-red-600'
-										onClick={() => {
-											setProductSelected(product);
-											setDeleteProductDialogVisible(true);
-										}}
-									>
-										<Trash2Icon className='w-6 h-6' />
-									</Toggle>
-								</TableCell>
-							</TableRow>
-						);
-					})}
+										<Toggle
+											className='hover:text-red-200 hover:bg-red-600'
+											onClick={() => {
+												setProductSelected(product);
+												setDeleteProductDialogVisible(
+													true
+												);
+											}}
+										>
+											<Trash2Icon className='w-6 h-6' />
+										</Toggle>
+									</TableCell>
+								</TableRow>
+							);
+						})}
 				</TableBody>
 			</Table>
 		</div>

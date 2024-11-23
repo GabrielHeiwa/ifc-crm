@@ -14,6 +14,7 @@ export class NegotiationsService {
         totalValue: data.totalValue,
         clientId: data.clientId,
         supplierId: data.supplierId,
+        status: data.status,
         NegotiationProduct: {
           createMany: {
             data: data.products.map((p: any) => ({ productId: p.id })),
@@ -49,5 +50,52 @@ export class NegotiationsService {
 
   findOne(id: string) {
     return `This action returns a #${id} negotiation`;
+  }
+
+  async update(id: string, data: any) {
+    const negotiation = await this.prismaService.negotiation.findFirstOrThrow({
+      where: { id },
+    });
+
+    await this.prismaService.negotiationProduct.deleteMany({
+      where: { negotiationId: negotiation.id },
+    });
+
+    await this.prismaService.negotiation.update({
+      where: {
+        id: negotiation.id,
+      },
+      data: {
+        clientId: data.clientId,
+        description: data.description,
+        discount: data.discount,
+        supplierId: data.supplierId,
+        totalValue: data.totalValue,
+        status: data.status,
+        NegotiationProduct: {
+          createMany: {
+            data: data.products.map((p: any) => ({ productId: p.id })),
+          },
+        },
+      },
+    });
+  }
+
+  async delete(id: string) {
+    const negotiation = await this.prismaService.negotiation.findFirstOrThrow({
+      where: { id },
+    });
+
+    await this.prismaService.negotiationProduct.deleteMany({
+      where: {
+        negotiationId: negotiation.id,
+      },
+    });
+
+    await this.prismaService.negotiation.delete({
+      where: {
+        id: negotiation.id,
+      },
+    });
   }
 }

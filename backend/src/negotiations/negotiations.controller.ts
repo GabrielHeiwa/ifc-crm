@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { NegotiationsService } from './negotiations.service';
 import { CreateNegotiationDto } from './dto/create-negotiation.dto';
 import { Prisma } from '@prisma/client';
@@ -20,5 +20,15 @@ export class NegotiationsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.negotiationsService.findOne(id);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() data: any) {
+    return this.negotiationsService.update(id, data);
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.negotiationsService.delete(id);
   }
 }
