@@ -37,7 +37,7 @@ import {
 	PlusIcon,
 	Trash2Icon,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
 	Popover,
 	PopoverContent,
@@ -53,6 +53,13 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { api } from "@/api";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 
 export function CreateNegotiationDialog() {
 	// States
@@ -78,12 +85,12 @@ export function CreateNegotiationDialog() {
 
 	const getSuppliers = useQuery({
 		queryKey: ["get-suppliers"],
-		queryFn: () => api.get("/suppliers"),
+		queryFn: () => api.get("/users/suppliers"),
 	});
 
 	const getClients = useQuery({
 		queryKey: ["get-clients"],
-		queryFn: () => api.get("/clients"),
+		queryFn: () => api.get("/users/clients"),
 	});
 
 	const products = getProducts.data?.data.map(({ id, name, price }: any) => ({
@@ -92,17 +99,48 @@ export function CreateNegotiationDialog() {
 		price,
 	}));
 
+	const suppliers = getSuppliers.data?.data.map(
+		({ id, cnpj, user: { email } }: any) => ({
+			value: id,
+			label: email,
+			supplier: {
+				id,
+				email,
+				cnpj,
+			},
+		})
+	);
+
+	const clients = getClients.data?.data.map(
+		({ id, cpf, user: { email } }: any) => ({
+			value: id,
+			label: email,
+			client: {
+				id,
+				cpf,
+				email,
+			},
+		})
+	);
+
+	// Mutations
+	const createNegotiation = useMutation({
+		mutationFn: (body: any) => api.post("/negotiations", body),
+		mutationKey: ["create-negotiation"],
+	});
+
 	// Refs
 	const formRef = useRef<HTMLFormElement | null>(null);
 
 	// Functions
 	async function onSubmit(data: any) {
-		console.log({ data });
-
 		data.totalValue = Number(data.totalValue.replaceAll(/\D/gm, "")) / 100;
 		data.discount = Number(data.discount.replaceAll(/\D/gm, "")) / 100;
+		data.clientId = data.client;
+		data.supplierId = data.supplier;
+		data.products = productsAdded;
 
-		console.log({ data });
+		const response = await createNegotiation.mutateAsync(data);
 	}
 
 	return (
@@ -220,6 +258,88 @@ export function CreateNegotiationDialog() {
 										</FormControl>
 										<FormDescription>
 											Valor de desconto da negociação
+										</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+
+						<div className='flex flew-row gap-x-4 items-center'>
+							<FormField
+								name='client'
+								control={form.control}
+								render={({ field }) => (
+									<FormItem className='flex-1'>
+										<FormLabel>Cliente</FormLabel>
+										<FormControl>
+											<Select
+												value={field.value}
+												onValueChange={field.onChange}
+											>
+												<SelectTrigger>
+													<SelectValue placeholder='Selecione um cliente' />
+												</SelectTrigger>
+
+												<SelectContent>
+													{clients?.map(
+														({
+															value,
+															label,
+															client,
+														}: any) => (
+															<SelectItem
+																value={value}
+															>
+																{label}
+															</SelectItem>
+														)
+													)}
+												</SelectContent>
+											</Select>
+										</FormControl>
+										<FormDescription>
+											Cliente da negociação
+										</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								name='supplier'
+								control={form.control}
+								render={({ field }) => (
+									<FormItem className='flex-1'>
+										<FormLabel>Fornecedor</FormLabel>
+										<FormControl>
+											<Select
+												value={field.value}
+												onValueChange={field.onChange}
+											>
+												<SelectTrigger>
+													<SelectValue placeholder='Selecione um fornecedor' />
+												</SelectTrigger>
+
+												<SelectContent>
+													{suppliers?.map(
+														({
+															value,
+															label,
+															supplier,
+														}: any) => (
+															<SelectItem
+																value={value}
+															>
+																{label}
+															</SelectItem>
+														)
+													)}
+												</SelectContent>
+											</Select>
+										</FormControl>
+										<FormDescription>
+											Fornecedor da negociação
 										</FormDescription>
 										<FormMessage />
 									</FormItem>

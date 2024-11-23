@@ -72,6 +72,26 @@ export class UsersService {
     return users;
   }
 
+  async findAllClients() {
+    const clients = await this.prismaService.client.findMany({
+      include: {
+        user: true,
+      },
+    });
+
+    return clients;
+  }
+
+  async findAllSuppliers() {
+    const suppliers = await this.prismaService.supplier.findMany({
+      include: {
+        user: true,
+      },
+    });
+
+    return suppliers;
+  }
+
   async delete(id: string) {
     const user = await this.prismaService.user.findUnique({
       where: { id },

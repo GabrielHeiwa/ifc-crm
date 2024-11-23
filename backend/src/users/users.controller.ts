@@ -24,6 +24,16 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('/clients')
+  findAllClients() {
+    return this.usersService.findAllClients();
+  }
+
+  @Get('/suppliers')
+  findAllSuppliers() {
+    return this.usersService.findAllSuppliers();
+  }
+
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.usersService.delete(id);
