@@ -13,6 +13,9 @@ interface NegotiationsState {
 	deleteNegotiationDialogVisible: boolean;
 	setDeleteNegotiationDialogVisible: (status: boolean) => void;
 
+	viewNegotiationDialogVisible: boolean;
+	setViewNegotiationDialogVisible: (status: boolean) => void;
+
 	productsAdded: any[];
 	addProduct: (product: any) => void;
 	removeProduct: (id: string) => void;
@@ -37,6 +40,11 @@ export const useNegotiationStore = create<NegotiationsState>()((set) => ({
 	deleteNegotiationDialogVisible: false,
 	setDeleteNegotiationDialogVisible(status) {
 		return set({ deleteNegotiationDialogVisible: status });
+	},
+
+	viewNegotiationDialogVisible: false,
+	setViewNegotiationDialogVisible(status) {
+		return set({ viewNegotiationDialogVisible: status })
 	},
 
 	productsAdded: [

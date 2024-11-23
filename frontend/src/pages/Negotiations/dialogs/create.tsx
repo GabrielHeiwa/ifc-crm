@@ -140,7 +140,7 @@ export function CreateNegotiationDialog() {
 		data.supplierId = data.supplier;
 		data.products = productsAdded;
 
-		const response = await createNegotiation.mutateAsync(data);
+		await createNegotiation.mutateAsync(data);
 	}
 
 	return (
