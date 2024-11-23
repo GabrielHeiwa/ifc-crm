@@ -3,8 +3,6 @@ import { Container } from "./components/Container"
 import { Header } from "./components/Header"
 import { Main } from "./components/Main"
 import { SideBar } from "./components/SideBar"
-import { Button } from "./components/ui/button"
-import { LogOutIcon } from "lucide-react"
 
 function App() {
 

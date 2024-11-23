@@ -296,7 +296,6 @@ export function CreateNegotiationDialog() {
 														({
 															value,
 															label,
-															client,
 														}: any) => (
 															<SelectItem
 																value={value}
@@ -336,7 +335,6 @@ export function CreateNegotiationDialog() {
 														({
 															value,
 															label,
-															supplier,
 														}: any) => (
 															<SelectItem
 																value={value}

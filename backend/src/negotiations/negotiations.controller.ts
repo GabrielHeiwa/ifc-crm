@@ -8,7 +8,7 @@ export class NegotiationsController {
   constructor(private readonly negotiationsService: NegotiationsService) { }
 
   @Post()
-  create(@Body() data: Prisma.NegotiationCreateInput) {
+  create(@Body() data: any) {
     return this.negotiationsService.create(data);
   }
 

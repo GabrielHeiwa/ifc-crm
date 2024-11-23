@@ -15,7 +15,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  create(@Body() data: Prisma.ProductCreateInput) {
+  create(@Body() data: any) {
     return this.productsService.create(data);
   }
 

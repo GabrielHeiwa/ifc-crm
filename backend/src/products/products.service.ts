@@ -7,7 +7,7 @@ import { Prisma } from '@prisma/client';
 export class ProductsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(data: Prisma.ProductCreateInput) {
+  async create(data: any) {
     const product = await this.prismaService.product.create({ data });
 
     return product;

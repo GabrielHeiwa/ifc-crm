@@ -19,3 +19,21 @@ services:
       - db-data:/bitnami/postgresql
     environment:
       - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+
+  web:
+    build: 
+      context: ./frontend
+    networks:
+      - net
+    ports:
+      - ${PORT_WEB}:80
+
+  backend:
+    build:
+      context: ./backend
+    networks:
+      - net
+    ports:
+      - ${PORT_BACKEND}:3000
+    environment:
+      - DATABASE_URL=postgresql://postgres:supersecret@db:5432/postgres?schema=public
